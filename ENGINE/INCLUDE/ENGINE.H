@@ -28,13 +28,19 @@ namespace TUI_Engine
     };
 
     void set_color_textmode();
+    void disable_blink();
     void clrscr(uint8_t bgcolor);
+
     void enable_cursor();
     void disable_cursor();
     void update_cursor(unsigned int x, unsigned int y);
+
     void putchar(unsigned int x, unsigned int y, uint8_t color, uint8_t bgcolor, char ch);
+    void putchars(unsigned int x, unsigned int y, uint8_t color, uint8_t bgcolor, char ch, unsigned int count);
     void print_string(unsigned int x, unsigned int y, uint8_t color, uint8_t bgcolor, const char *s);
-    void disable_blink();
-};
+
+    void draw_window(unsigned int x, unsigned int y, unsigned int width, unsigned int height,
+                     uint8_t color, uint8_t bgcolor, const char *title = "", bool thick = true);
+}; // namespace TUI_Engine
 
 #endif

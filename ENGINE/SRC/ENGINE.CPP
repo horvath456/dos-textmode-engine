@@ -4,6 +4,7 @@
 #include <dos.h>
 #include <stdio>
 #include <conio.h>
+#include <cstring>
 
 using namespace std;
 
@@ -22,6 +23,22 @@ void TUI_Engine::clrscr(uint8_t bgcolor)
     for (unsigned int i = 0; i < 80 * 25; i++)
     {
         *video++ = 0x20 | (bgcolor << 12);
+    }
+}
+
+void TUI_Engine::disable_blink()
+{
+    _asm {
+        mov dx, 0x3DA
+        in al, dx
+        mov dx, 0x3C0
+        mov al, 0x30
+        out dx, al
+        inc dx
+        in al, dx
+        and al, 0xF7
+        dec dx
+        out dx, al
     }
 }
 
@@ -58,6 +75,18 @@ void TUI_Engine::putchar(unsigned int x, unsigned int y, uint8_t color, uint8_t 
     *video = ch | (attrib << 8);
 }
 
+void TUI_Engine::putchars(unsigned int x, unsigned int y, uint8_t color, uint8_t bgcolor, char ch, unsigned int count)
+{
+    uint16_t far *video = (uint16_t far *)0xB8000000L;
+    video += (y * 80 + x);
+    uint16_t attrib = (bgcolor << 4) | (color & 0x0F);
+
+    for (unsigned int i = 0; i < count; i++)
+    {
+        *video++ = ch | (attrib << 8);
+    }
+}
+
 void TUI_Engine::print_string(unsigned int x, unsigned int y, uint8_t color, uint8_t bgcolor, const char *s)
 {
     uint16_t far *video = (uint16_t far *)0xB8000000L;
@@ -71,18 +100,26 @@ void TUI_Engine::print_string(unsigned int x, unsigned int y, uint8_t color, uin
     }
 }
 
-void TUI_Engine::disable_blink()
+void TUI_Engine::draw_window(unsigned int x, unsigned int y, unsigned int width, unsigned int height,
+                             uint8_t color, uint8_t bgcolor, const char *title, bool thick)
 {
-    _asm {
-        mov dx, 0x3DA
-        in al, dx
-        mov dx, 0x3C0
-        mov al, 0x30
-        out dx, al
-        inc dx
-        in al, dx
-        and al, 0xF7
-        dec dx
-        out dx, al
+    TUI_Engine::putchar(x, y, color, bgcolor, thick ? 201 : 218);
+    TUI_Engine::putchar(x + width - 1, y, color, bgcolor, thick ? 187 : 191);
+    TUI_Engine::putchar(x, y + height - 1, color, bgcolor, thick ? 200 : 192);
+    TUI_Engine::putchar(x + width - 1, y + height - 1, color, bgcolor, thick ? 188 : 217);
+
+    TUI_Engine::putchars(x + 1, y, color, bgcolor, thick ? 205 : 196, width - 2);
+    TUI_Engine::putchars(x + 1, y + height - 1, color, bgcolor, thick ? 205 : 196, width - 2);
+    for (unsigned i = 0; i < height - 2; i++)
+    {
+        TUI_Engine::putchar(x, y + 1 + i, color, bgcolor, thick ? 186 : 179);
+        TUI_Engine::putchar(x + width - 1, y + 1 + i, color, bgcolor, thick ? 186 : 179);
+    }
+
+    size_t title_length = strlen(title);
+    if (title_length > 0)
+    {
+        unsigned int title_x = x + (unsigned int)((width - title_length) / 2);
+        TUI_Engine::print_string(title_x, y, color, bgcolor, title);
     }
 }

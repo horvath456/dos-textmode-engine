@@ -173,4 +173,14 @@ void TUI_Engine::draw_window_2(unsigned int x, unsigned int y, unsigned int widt
 
     // draw line under title in 3rd row
     TUI_Engine::putchars(x + 1, y + 2, color, bgcolor, thickheadline ? 205 : 196, width - 2);
+
+    // fix corner chars
+    if (thick == thickheadline)
+    {
+        // on my codepage, it only works for arguments true, true or false, false
+        TUI_Engine::putchar(x, y + 2, color, bgcolor,
+                            thick ? (thickheadline ? 204 : 199) : (thickheadline ? 198 : 195));
+        TUI_Engine::putchar(x + width - 1, y + 2, color, bgcolor,
+                            thick ? (thickheadline ? 185 : 182) : (thickheadline ? 181 : 180));
+    }
 }

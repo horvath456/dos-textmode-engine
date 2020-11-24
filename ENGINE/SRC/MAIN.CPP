@@ -24,5 +24,14 @@ int main()
     window1.set_shadow(true);
     window1.draw();
 
+    TUI_Engine::Window banner;
+    banner.set_position(10, 3);
+    banner.set_size(60, 3);
+    banner.set_window_and_title_colors(TUI_Engine::YELLOW, TUI_Engine::BLUE);
+    banner.set_title("SETTINGS");
+    banner.set_title_type(false);
+    banner.set_shadow(false);
+    banner.draw();
+
     return 0;
 }

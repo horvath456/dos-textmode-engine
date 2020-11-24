@@ -225,17 +225,20 @@ void TUI_Engine::Window::draw()
             TUI_Engine::putchars(x + 1, y + 1, title_fgcolor, title_bgcolor, TUI_Engine::ONLYBACKGROUND, width - 2);
             TUI_Engine::print_string(title_x, y + 1, title_fgcolor, title_bgcolor, title.c_str());
 
-            // draw line under title in 3rd row
-            TUI_Engine::putchars(x + 1, y + 2, fgcolor, bgcolor, title_thick_underline ? 205 : 196, width - 2);
-
-            // fix corner chars
-            if (thick == title_thick_underline)
+            if (height > 3)
             {
-                // on my codepage, it only works for arguments true, true or false, false
-                TUI_Engine::putchar(x, y + 2, fgcolor, bgcolor,
-                                    thick ? (title_thick_underline ? 204 : 199) : (title_thick_underline ? 198 : 195));
-                TUI_Engine::putchar(x + width - 1, y + 2, fgcolor, bgcolor,
-                                    thick ? (title_thick_underline ? 185 : 182) : (title_thick_underline ? 181 : 180));
+                // draw line under title in 3rd row if the window height is more than 3
+                TUI_Engine::putchars(x + 1, y + 2, fgcolor, bgcolor, title_thick_underline ? 205 : 196, width - 2);
+
+                // fix corner chars
+                if (thick == title_thick_underline)
+                {
+                    // on my codepage, it only works for arguments true, true or false, false
+                    TUI_Engine::putchar(x, y + 2, fgcolor, bgcolor,
+                                        thick ? (title_thick_underline ? 204 : 199) : (title_thick_underline ? 198 : 195));
+                    TUI_Engine::putchar(x + width - 1, y + 2, fgcolor, bgcolor,
+                                        thick ? (title_thick_underline ? 185 : 182) : (title_thick_underline ? 181 : 180));
+                }
             }
         }
     }

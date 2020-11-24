@@ -154,6 +154,7 @@ void TUI_Engine::draw_window_1(unsigned int x, unsigned int y, unsigned int widt
         for (unsigned int i = 0; i < height; i++)
         {
             TUI_Engine::change_attrs(x + width, y + 1 + i, TUI_Engine::DARKGREY, TUI_Engine::BLACK);
+            TUI_Engine::change_attrs(x + width + 1, y + 1 + i, TUI_Engine::DARKGREY, TUI_Engine::BLACK);
         }
     }
 }

@@ -18,9 +18,9 @@ int main()
     TUI_Engine::Window window1;
     window1.set_position(20, 10);
     window1.set_size(30, 10);
-    window1.set_colors(TUI_Engine::YELLOW, TUI_Engine::BLUE);
-    window1.set_window_title("SETTINGS");
-    window1.set_window_title_type(false, false);
+    window1.set_window_and_title_colors(TUI_Engine::YELLOW, TUI_Engine::BLUE);
+    window1.set_title("SETTINGS");
+    window1.set_title_type(true);
     window1.set_shadow(true);
     window1.draw();
 

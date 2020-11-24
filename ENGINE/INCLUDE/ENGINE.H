@@ -57,12 +57,14 @@ namespace TUI_Engine
         Window();
         void set_position(unsigned int x, unsigned int y);
         void set_size(unsigned int width, unsigned int height);
-        void set_colors(uint8_t fgcolor, uint8_t bgcolor);
+        void set_window_colors(uint8_t fgcolor, uint8_t bgcolor);
+        void set_window_and_title_colors(uint8_t fgcolor, uint8_t bgcolor);
         void set_fillchar(uint8_t fillchar);
         void set_shadow(bool shadow);
         void set_thickness(bool thick);
-        void set_window_title(const char *title);
-        void set_window_title_type(bool title_top, bool thick_underline);
+        void set_title(const char *title);
+        void set_title_type(bool title_top, bool centered = true, bool thick_underline = false);
+        void set_title_colors(uint8_t fgcolor, uint8_t bgcolor);
         void draw();
 
     private:
@@ -77,7 +79,10 @@ namespace TUI_Engine
         bool thick;
         bool shadow;
         bool title_top;
-        bool thick_underline;
+        bool title_centered;
+        bool title_thick_underline;
+        uint8_t title_fgcolor;
+        uint8_t title_bgcolor;
     };
 }; // namespace TUI_Engine
 

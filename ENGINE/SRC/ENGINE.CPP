@@ -118,12 +118,15 @@ TUI_Engine::Window::Window()
     height = 24;
     fgcolor = LIGHTCYAN;
     bgcolor = BLUE;
+    title_fgcolor = LIGHTCYAN;
+    title_bgcolor = BLUE;
     fillchar = ONLYBACKGROUND;
     title = "";
     thick = true;
     shadow = true;
     title_top = true;
-    thick_underline = false;
+    title_centered = true;
+    title_thick_underline = false;
 }
 void TUI_Engine::Window::set_position(unsigned int new_x, unsigned int new_y)
 {
@@ -135,10 +138,17 @@ void TUI_Engine::Window::set_size(unsigned int new_width, unsigned int new_heigh
     width = new_width;
     height = new_height;
 }
-void TUI_Engine::Window::set_colors(uint8_t new_fgcolor, uint8_t new_bgcolor)
+void TUI_Engine::Window::set_window_colors(uint8_t new_fgcolor, uint8_t new_bgcolor)
 {
     fgcolor = new_fgcolor;
     bgcolor = new_bgcolor;
+}
+void TUI_Engine::Window::set_window_and_title_colors(uint8_t new_fgcolor, uint8_t new_bgcolor)
+{
+    fgcolor = new_fgcolor;
+    bgcolor = new_bgcolor;
+    title_fgcolor = new_fgcolor;
+    title_bgcolor = new_bgcolor;
 }
 void TUI_Engine::Window::set_fillchar(uint8_t new_fillchar)
 {
@@ -152,14 +162,20 @@ void TUI_Engine::Window::set_thickness(bool new_thick)
 {
     thick = new_thick;
 }
-void TUI_Engine::Window::set_window_title(const char *new_title)
+void TUI_Engine::Window::set_title(const char *new_title)
 {
     title = new_title;
 }
-void TUI_Engine::Window::set_window_title_type(bool new_title_top, bool new_thick_underline)
+void TUI_Engine::Window::set_title_type(bool new_title_top, bool new_centered, bool new_thick_underline)
 {
     title_top = new_title_top;
-    thick_underline = new_thick_underline;
+    title_thick_underline = new_thick_underline;
+    title_centered = new_centered;
+}
+void TUI_Engine::Window::set_title_colors(uint8_t new_fgcolor, uint8_t new_bgcolor)
+{
+    title_fgcolor = new_fgcolor;
+    title_bgcolor = new_bgcolor;
 }
 void TUI_Engine::Window::draw()
 {
@@ -190,32 +206,36 @@ void TUI_Engine::Window::draw()
     size_t title_length = title.size();
     if (title_length > 0)
     {
-        if (title_top)
+        unsigned int title_x;
+        if (title_centered)
         {
-            // write title
-            size_t title_length = title.size();
-            if (title_length > 0)
-            {
-                unsigned int title_x = x + (unsigned int)((width - title_length) / 2);
-                TUI_Engine::print_string(title_x, y, fgcolor, bgcolor, title.c_str());
-            }
+            title_x = x + (unsigned int)((width - title_length) / 2);
+        }
+        else
+        {
+            title_x = x + 2;
+        }
+
+        if (title_top) // write title in top row
+        {
+            TUI_Engine::print_string(title_x, y, title_fgcolor, title_bgcolor, title.c_str());
         }
         else // draw title in 2nd row
         {
-            unsigned int title_x = x + (unsigned int)((width - title_length) / 2);
-            TUI_Engine::print_string(title_x, y + 1, fgcolor, bgcolor, title.c_str());
+            TUI_Engine::putchars(x + 1, y + 1, title_fgcolor, title_bgcolor, TUI_Engine::ONLYBACKGROUND, width - 2);
+            TUI_Engine::print_string(title_x, y + 1, title_fgcolor, title_bgcolor, title.c_str());
 
             // draw line under title in 3rd row
-            TUI_Engine::putchars(x + 1, y + 2, fgcolor, bgcolor, thick_underline ? 205 : 196, width - 2);
+            TUI_Engine::putchars(x + 1, y + 2, fgcolor, bgcolor, title_thick_underline ? 205 : 196, width - 2);
 
             // fix corner chars
-            if (thick == thick_underline)
+            if (thick == title_thick_underline)
             {
                 // on my codepage, it only works for arguments true, true or false, false
                 TUI_Engine::putchar(x, y + 2, fgcolor, bgcolor,
-                                    thick ? (thick_underline ? 204 : 199) : (thick_underline ? 198 : 195));
+                                    thick ? (title_thick_underline ? 204 : 199) : (title_thick_underline ? 198 : 195));
                 TUI_Engine::putchar(x + width - 1, y + 2, fgcolor, bgcolor,
-                                    thick ? (thick_underline ? 185 : 182) : (thick_underline ? 181 : 180));
+                                    thick ? (title_thick_underline ? 185 : 182) : (title_thick_underline ? 181 : 180));
             }
         }
     }

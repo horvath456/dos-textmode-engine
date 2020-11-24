@@ -17,7 +17,7 @@ void TUI_Engine::set_color_textmode()
     }
 }
 
-void TUI_Engine::clrscr(uint8_t bgcolor, uint8_t fgcolor, char fillchar)
+void TUI_Engine::clrscr(uint8_t fgcolor, uint8_t bgcolor, char fillchar)
 {
     uint16_t far *video = (uint16_t far *)0xB8000000L;
     uint16_t attrib = (bgcolor << 4) | (fgcolor & 0x0F);
@@ -101,26 +101,75 @@ void TUI_Engine::print_string(unsigned int x, unsigned int y, uint8_t color, uin
     }
 }
 
-void TUI_Engine::draw_window(unsigned int x, unsigned int y, unsigned int width, unsigned int height,
-                             uint8_t color, uint8_t bgcolor, const char *title, bool thick)
+void TUI_Engine::change_attrs(unsigned int x, unsigned int y, uint8_t fgcolor, uint8_t bgcolor)
 {
+    uint8_t far *video = (uint8_t far *)0xB8000000L;
+    video += ((y * 80 + x) << 1) + 1;
+    uint8_t attrib = (bgcolor << 4) | (fgcolor & 0x0F);
+    *video = attrib;
+}
+
+void TUI_Engine::draw_window_1(unsigned int x, unsigned int y, unsigned int width, unsigned int height,
+                               uint8_t color, uint8_t bgcolor, uint8_t fillchar,
+                               const char *title, bool thick, bool shadow)
+{
+    // draw corners
     TUI_Engine::putchar(x, y, color, bgcolor, thick ? 201 : 218);
     TUI_Engine::putchar(x + width - 1, y, color, bgcolor, thick ? 187 : 191);
     TUI_Engine::putchar(x, y + height - 1, color, bgcolor, thick ? 200 : 192);
     TUI_Engine::putchar(x + width - 1, y + height - 1, color, bgcolor, thick ? 188 : 217);
 
+    // draw horizontal lines
     TUI_Engine::putchars(x + 1, y, color, bgcolor, thick ? 205 : 196, width - 2);
     TUI_Engine::putchars(x + 1, y + height - 1, color, bgcolor, thick ? 205 : 196, width - 2);
+
+    // draw vertica lines
     for (unsigned i = 0; i < height - 2; i++)
     {
         TUI_Engine::putchar(x, y + 1 + i, color, bgcolor, thick ? 186 : 179);
         TUI_Engine::putchar(x + width - 1, y + 1 + i, color, bgcolor, thick ? 186 : 179);
     }
 
+    // fill with fillchar
+    for (unsigned i = 0; i < height - 2; i++)
+    {
+        TUI_Engine::putchars(x + 1, y + i + 1, color, bgcolor, fillchar, width - 2);
+    }
+
+    // write title
     size_t title_length = strlen(title);
     if (title_length > 0)
     {
         unsigned int title_x = x + (unsigned int)((width - title_length) / 2);
         TUI_Engine::print_string(title_x, y, color, bgcolor, title);
     }
+
+    // draw shadow
+    if (shadow)
+    {
+        for (unsigned int i = 0; i < width; i++)
+        {
+            TUI_Engine::change_attrs(x + 1 + i, y + height, TUI_Engine::DARKGREY, TUI_Engine::BLACK);
+        }
+        for (unsigned int i = 0; i < height; i++)
+        {
+            TUI_Engine::change_attrs(x + width, y + 1 + i, TUI_Engine::DARKGREY, TUI_Engine::BLACK);
+        }
+    }
+}
+
+void TUI_Engine::draw_window_2(unsigned int x, unsigned int y, unsigned int width, unsigned int height,
+                               uint8_t color, uint8_t bgcolor, uint8_t fillchar,
+                               const char *title, bool thick, bool thickheadline, bool shadow)
+{
+    // basis for window 2 is window 1
+    TUI_Engine::draw_window_1(x, y, width, height, color, bgcolor, fillchar, "", thick, shadow);
+
+    // draw title in 2nd row
+    size_t title_length = strlen(title);
+    unsigned int title_x = x + (unsigned int)((width - title_length) / 2);
+    TUI_Engine::print_string(title_x, y + 1, color, bgcolor, title);
+
+    // draw line under title in 3rd row
+    TUI_Engine::putchars(x + 1, y + 2, color, bgcolor, thickheadline ? 205 : 196, width - 2);
 }

@@ -38,7 +38,7 @@ namespace TUI_Engine
 
     void set_color_textmode();
     void disable_blink();
-    void clrscr(uint8_t bgcolor = TUI_Engine::BLACK, uint8_t fgcolor = TUI_Engine::LIGHTGREY,
+    void clrscr(uint8_t fgcolor = TUI_Engine::LIGHTGREY, uint8_t bgcolor = TUI_Engine::BLACK,
                 char fillchar = TUI_Engine::ONLYBACKGROUND);
 
     void enable_cursor();
@@ -48,9 +48,14 @@ namespace TUI_Engine
     void putchar(unsigned int x, unsigned int y, uint8_t color, uint8_t bgcolor, char ch);
     void putchars(unsigned int x, unsigned int y, uint8_t color, uint8_t bgcolor, char ch, unsigned int count);
     void print_string(unsigned int x, unsigned int y, uint8_t color, uint8_t bgcolor, const char *s);
+    void change_attrs(unsigned int x, unsigned int y, uint8_t fgcolor, uint8_t bgcolor);
 
-    void draw_window(unsigned int x, unsigned int y, unsigned int width, unsigned int height,
-                     uint8_t color, uint8_t bgcolor, const char *title = "", bool thick = true);
+    void draw_window_1(unsigned int x, unsigned int y, unsigned int width, unsigned int height,
+                       uint8_t color, uint8_t bgcolor, uint8_t fillchar = ONLYBACKGROUND,
+                       const char *title = "", bool thick = true, bool shadow = false);
+    void draw_window_2(unsigned int x, unsigned int y, unsigned int width, unsigned int height,
+                       uint8_t color, uint8_t bgcolor, uint8_t fillchar = ONLYBACKGROUND,
+                       const char *title = "", bool thick = true, bool thickheadline = false, bool shadow = false);
 }; // namespace TUI_Engine
 
 #endif

@@ -9,6 +9,8 @@ del main.exe
 mkdir build
 del build\*.*
 cd build
+wpp -4 -fp5 -ml -xs -obehi+l+mrt -zq ..\src\engine.cpp
+wlib engine +engine
 wpp -4 -fp5 -ml -xs -obehi+l+mrt -zq ..\src\main.cpp
 wlink @..\proj.lnk
 cd ..

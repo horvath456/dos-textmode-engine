@@ -15,10 +15,14 @@ int main()
     TUI_Engine::clrscr(TUI_Engine::CYAN, TUI_Engine::BLUE, TUI_Engine::DOT_PATTERN_1);
     TUI_Engine::disable_cursor();
 
-    TUI_Engine::draw_window_1(20, 10, 30, 10, TUI_Engine::YELLOW, TUI_Engine::BLUE,
-                              TUI_Engine::ONLYBACKGROUND, "SETTINGS", true, false);
-    TUI_Engine::draw_window_2(2, 2, 20, 15, TUI_Engine::YELLOW, TUI_Engine::BLUE,
-                              TUI_Engine::ONLYBACKGROUND, "SETTINGS", false, true, true);
+    TUI_Engine::Window window1;
+    window1.set_position(20, 10);
+    window1.set_size(30, 10);
+    window1.set_colors(TUI_Engine::YELLOW, TUI_Engine::BLUE);
+    window1.set_window_title("SETTINGS");
+    window1.set_window_title_type(false, false);
+    window1.set_shadow(true);
+    window1.draw();
 
     return 0;
 }

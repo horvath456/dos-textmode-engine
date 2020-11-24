@@ -5,6 +5,7 @@
 #include <stdio>
 #include <conio.h>
 #include <cstring>
+#include <string>
 
 using namespace std;
 
@@ -109,39 +110,114 @@ void TUI_Engine::change_attrs(unsigned int x, unsigned int y, uint8_t fgcolor, u
     *video = attrib;
 }
 
-void TUI_Engine::draw_window_1(unsigned int x, unsigned int y, unsigned int width, unsigned int height,
-                               uint8_t color, uint8_t bgcolor, uint8_t fillchar,
-                               const char *title, bool thick, bool shadow)
+TUI_Engine::Window::Window()
+{
+    x = 0;
+    y = 0;
+    width = 78;
+    height = 24;
+    fgcolor = LIGHTCYAN;
+    bgcolor = BLUE;
+    fillchar = ONLYBACKGROUND;
+    title = "";
+    thick = true;
+    shadow = true;
+    title_top = true;
+    thick_underline = false;
+}
+void TUI_Engine::Window::set_position(unsigned int new_x, unsigned int new_y)
+{
+    x = new_x;
+    y = new_y;
+}
+void TUI_Engine::Window::set_size(unsigned int new_width, unsigned int new_height)
+{
+    width = new_width;
+    height = new_height;
+}
+void TUI_Engine::Window::set_colors(uint8_t new_fgcolor, uint8_t new_bgcolor)
+{
+    fgcolor = new_fgcolor;
+    bgcolor = new_bgcolor;
+}
+void TUI_Engine::Window::set_fillchar(uint8_t new_fillchar)
+{
+    fillchar = new_fillchar;
+}
+void TUI_Engine::Window::set_shadow(bool new_shadow)
+{
+    shadow = new_shadow;
+}
+void TUI_Engine::Window::set_thickness(bool new_thick)
+{
+    thick = new_thick;
+}
+void TUI_Engine::Window::set_window_title(const char *new_title)
+{
+    title = new_title;
+}
+void TUI_Engine::Window::set_window_title_type(bool new_title_top, bool new_thick_underline)
+{
+    title_top = new_title_top;
+    thick_underline = new_thick_underline;
+}
+void TUI_Engine::Window::draw()
 {
     // draw corners
-    TUI_Engine::putchar(x, y, color, bgcolor, thick ? 201 : 218);
-    TUI_Engine::putchar(x + width - 1, y, color, bgcolor, thick ? 187 : 191);
-    TUI_Engine::putchar(x, y + height - 1, color, bgcolor, thick ? 200 : 192);
-    TUI_Engine::putchar(x + width - 1, y + height - 1, color, bgcolor, thick ? 188 : 217);
+    TUI_Engine::putchar(x, y, fgcolor, bgcolor, thick ? 201 : 218);
+    TUI_Engine::putchar(x + width - 1, y, fgcolor, bgcolor, thick ? 187 : 191);
+    TUI_Engine::putchar(x, y + height - 1, fgcolor, bgcolor, thick ? 200 : 192);
+    TUI_Engine::putchar(x + width - 1, y + height - 1, fgcolor, bgcolor, thick ? 188 : 217);
 
     // draw horizontal lines
-    TUI_Engine::putchars(x + 1, y, color, bgcolor, thick ? 205 : 196, width - 2);
-    TUI_Engine::putchars(x + 1, y + height - 1, color, bgcolor, thick ? 205 : 196, width - 2);
+    TUI_Engine::putchars(x + 1, y, fgcolor, bgcolor, thick ? 205 : 196, width - 2);
+    TUI_Engine::putchars(x + 1, y + height - 1, fgcolor, bgcolor, thick ? 205 : 196, width - 2);
 
-    // draw vertica lines
+    // draw vertical lines
     for (unsigned i = 0; i < height - 2; i++)
     {
-        TUI_Engine::putchar(x, y + 1 + i, color, bgcolor, thick ? 186 : 179);
-        TUI_Engine::putchar(x + width - 1, y + 1 + i, color, bgcolor, thick ? 186 : 179);
+        TUI_Engine::putchar(x, y + 1 + i, fgcolor, bgcolor, thick ? 186 : 179);
+        TUI_Engine::putchar(x + width - 1, y + 1 + i, fgcolor, bgcolor, thick ? 186 : 179);
     }
 
     // fill with fillchar
     for (unsigned i = 0; i < height - 2; i++)
     {
-        TUI_Engine::putchars(x + 1, y + i + 1, color, bgcolor, fillchar, width - 2);
+        TUI_Engine::putchars(x + 1, y + i + 1, fgcolor, bgcolor, fillchar, width - 2);
     }
 
-    // write title
-    size_t title_length = strlen(title);
+    // draw title
+    size_t title_length = title.size();
     if (title_length > 0)
     {
-        unsigned int title_x = x + (unsigned int)((width - title_length) / 2);
-        TUI_Engine::print_string(title_x, y, color, bgcolor, title);
+        if (title_top)
+        {
+            // write title
+            size_t title_length = title.size();
+            if (title_length > 0)
+            {
+                unsigned int title_x = x + (unsigned int)((width - title_length) / 2);
+                TUI_Engine::print_string(title_x, y, fgcolor, bgcolor, title.c_str());
+            }
+        }
+        else // draw title in 2nd row
+        {
+            unsigned int title_x = x + (unsigned int)((width - title_length) / 2);
+            TUI_Engine::print_string(title_x, y + 1, fgcolor, bgcolor, title.c_str());
+
+            // draw line under title in 3rd row
+            TUI_Engine::putchars(x + 1, y + 2, fgcolor, bgcolor, thick_underline ? 205 : 196, width - 2);
+
+            // fix corner chars
+            if (thick == thick_underline)
+            {
+                // on my codepage, it only works for arguments true, true or false, false
+                TUI_Engine::putchar(x, y + 2, fgcolor, bgcolor,
+                                    thick ? (thick_underline ? 204 : 199) : (thick_underline ? 198 : 195));
+                TUI_Engine::putchar(x + width - 1, y + 2, fgcolor, bgcolor,
+                                    thick ? (thick_underline ? 185 : 182) : (thick_underline ? 181 : 180));
+            }
+        }
     }
 
     // draw shadow
@@ -156,31 +232,5 @@ void TUI_Engine::draw_window_1(unsigned int x, unsigned int y, unsigned int widt
             TUI_Engine::change_attrs(x + width, y + 1 + i, TUI_Engine::DARKGREY, TUI_Engine::BLACK);
             TUI_Engine::change_attrs(x + width + 1, y + 1 + i, TUI_Engine::DARKGREY, TUI_Engine::BLACK);
         }
-    }
-}
-
-void TUI_Engine::draw_window_2(unsigned int x, unsigned int y, unsigned int width, unsigned int height,
-                               uint8_t color, uint8_t bgcolor, uint8_t fillchar,
-                               const char *title, bool thick, bool thickheadline, bool shadow)
-{
-    // basis for window 2 is window 1
-    TUI_Engine::draw_window_1(x, y, width, height, color, bgcolor, fillchar, "", thick, shadow);
-
-    // draw title in 2nd row
-    size_t title_length = strlen(title);
-    unsigned int title_x = x + (unsigned int)((width - title_length) / 2);
-    TUI_Engine::print_string(title_x, y + 1, color, bgcolor, title);
-
-    // draw line under title in 3rd row
-    TUI_Engine::putchars(x + 1, y + 2, color, bgcolor, thickheadline ? 205 : 196, width - 2);
-
-    // fix corner chars
-    if (thick == thickheadline)
-    {
-        // on my codepage, it only works for arguments true, true or false, false
-        TUI_Engine::putchar(x, y + 2, color, bgcolor,
-                            thick ? (thickheadline ? 204 : 199) : (thickheadline ? 198 : 195));
-        TUI_Engine::putchar(x + width - 1, y + 2, color, bgcolor,
-                            thick ? (thickheadline ? 185 : 182) : (thickheadline ? 181 : 180));
     }
 }

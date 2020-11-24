@@ -4,6 +4,7 @@
 #define __engine_h__
 
 #include <stdint.h>
+#include <string>
 
 namespace TUI_Engine
 {
@@ -50,12 +51,34 @@ namespace TUI_Engine
     void print_string(unsigned int x, unsigned int y, uint8_t color, uint8_t bgcolor, const char *s);
     void change_attrs(unsigned int x, unsigned int y, uint8_t fgcolor, uint8_t bgcolor);
 
-    void draw_window_1(unsigned int x, unsigned int y, unsigned int width, unsigned int height,
-                       uint8_t color, uint8_t bgcolor, uint8_t fillchar = ONLYBACKGROUND,
-                       const char *title = "", bool thick = true, bool shadow = false);
-    void draw_window_2(unsigned int x, unsigned int y, unsigned int width, unsigned int height,
-                       uint8_t color, uint8_t bgcolor, uint8_t fillchar = ONLYBACKGROUND,
-                       const char *title = "", bool thick = true, bool thickheadline = false, bool shadow = false);
+    class Window
+    {
+    public:
+        Window();
+        void set_position(unsigned int x, unsigned int y);
+        void set_size(unsigned int width, unsigned int height);
+        void set_colors(uint8_t fgcolor, uint8_t bgcolor);
+        void set_fillchar(uint8_t fillchar);
+        void set_shadow(bool shadow);
+        void set_thickness(bool thick);
+        void set_window_title(const char *title);
+        void set_window_title_type(bool title_top, bool thick_underline);
+        void draw();
+
+    private:
+        unsigned int x;
+        unsigned int y;
+        unsigned int width;
+        unsigned int height;
+        uint8_t fgcolor;
+        uint8_t bgcolor;
+        uint8_t fillchar;
+        std::string title;
+        bool thick;
+        bool shadow;
+        bool title_top;
+        bool thick_underline;
+    };
 }; // namespace TUI_Engine
 
 #endif

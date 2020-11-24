@@ -17,12 +17,13 @@ void TUI_Engine::set_color_textmode()
     }
 }
 
-void TUI_Engine::clrscr(uint8_t bgcolor)
+void TUI_Engine::clrscr(uint8_t bgcolor, uint8_t fgcolor, char fillchar)
 {
     uint16_t far *video = (uint16_t far *)0xB8000000L;
+    uint16_t attrib = (bgcolor << 4) | (fgcolor & 0x0F);
     for (unsigned int i = 0; i < 80 * 25; i++)
     {
-        *video++ = 0x20 | (bgcolor << 12);
+        *video++ = fillchar | (attrib << 8);
     }
 }
 

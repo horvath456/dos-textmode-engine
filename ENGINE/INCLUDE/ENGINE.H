@@ -27,9 +27,19 @@ namespace TUI_Engine
         WHITE = 0xF
     };
 
+    enum CLRSCR_FILLCHAR
+    {
+        ONLYBACKGROUND = 0x20, // SPACE CHAR
+        ONLYFOREGROUND = 219,  // FILLED RECT
+        DOT_PATTERN_1 = 176,
+        DOT_PATTERN_2 = 177,
+        DOT_PATTERN_3 = 178
+    };
+
     void set_color_textmode();
     void disable_blink();
-    void clrscr(uint8_t bgcolor);
+    void clrscr(uint8_t bgcolor = TUI_Engine::BLACK, uint8_t fgcolor = TUI_Engine::LIGHTGREY,
+                char fillchar = TUI_Engine::ONLYBACKGROUND);
 
     void enable_cursor();
     void disable_cursor();

@@ -14,7 +14,7 @@ wpp -4 -fp5 -ml -xs -obehi+l+mrt -zq ..\src\engine.cpp
 wlib engine +engine
 
 mkdir dist
-del dist\engine.lib
+del dist\tuilib.lib
 copy engine.lib dist\tuilib.lib
 mkdir dist\include
 del dist\include\*.h

@@ -24,8 +24,8 @@ Install the 16bit and 32bit compiler for dos.
 
 
 ## Compile
-To compile the project, run COMPILE.BAT in the DRIVER directory.
+To compile the project, run COMPILE.BAT in the ENGINE directory.
 
 
 ## Run
-To run the project, execute MAIN.EXE in the DRIVER directory.
+To run the project, execute MAIN.EXE in the ENGINE directory.
